@@ -9,3 +9,33 @@
   background: -moz-radial-gradient(30% 30%, circle, #ff361b, #000);
   background: radial-gradient(30% 30%, circle, #ff361b, #000);
 }
+
+.brown {
+  background: -webkit-radial-gradient(30% 30%, circle, #b8a09e, #000);
+  background: -moz-radial-gradient(30% 30%, circle, #b8a09e, #000);
+  background: radial-gradient(30% 30%, circle, #b8a09e, #000);
+}
+
+.pink {
+  background: -webkit-radial-gradient(30% 30%, circle, #fa8efa, #000);
+  background: -moz-radial-gradient(30% 30%, circle, #fa8efa, #000);
+  background: radial-gradient(30% 30%, circle, #fa8efa, #000);
+}
+
+.green {
+  background: -webkit-radial-gradient(30% 30%, circle, #a0fa8e, #000);
+  background: -moz-radial-gradient(30% 30%, circle, #a0fa8e, #000);
+  background: radial-gradient(30% 30%, circle, #a0fa8e, #000);
+}
+
+.blue {
+  background: -webkit-radial-gradient(30% 30%, circle, #958bee, #000);
+  background: -moz-radial-gradient(30% 30%, circle, #958bee, #000);
+  background: radial-gradient(30% 30%, circle, #958bee, #000);
+}
+
+.yellow {
+  background: -webkit-radial-gradient(30% 30%, circle, #eef5cf, rgb(50, 50, 0));
+  background: -moz-radial-gradient(30% 30%, circle, #eef5cf, rgb(50, 50, 0));
+  background: radial-gradient(30% 30%, circle, #eef5cf, rgb(40, 40, 0));
+}
