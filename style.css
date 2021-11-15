@@ -4,20 +4,55 @@
 }
 
 .content {
-  width: 900px;
+  width: 630px;
   margin: auto;
   display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#time_container {
+  margin: 20px;
+  font-size: 30pt;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 900;
+  padding: 20px;
+  border: 5px solid black;
+  border-radius: 16px;
+  background-color: black;
+  color: white;
 }
 
 #board {
+  width: 634px;
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  flex-direction: row;
+  border: 2px solid black;
+  box-sizing: border-box;
 }
 
 .cell {
   box-sizing: border-box;
   border: 2px solid black;
-  color: darkgray;
+  background-color: lightgray;
   width: 50px;
   height: 50px;
+}
+
+.ball {
+  display: inline-block;
+  position: absolute;
+  border-radius: 50%;
+  height: 50px;
+  width: 50px;
+  margin: 0;
+  z-index: 1;
+}
+
+.cyan {
+  background: -webkit-radial-gradient(50% 50%, circle, #5cabff, #000);
+  background: -moz-radial-gradient(50% 50%, circle, #5cabff, #000);
+  background: radial-gradient(50% 50%, circle, #5cabff, #000);
 }
