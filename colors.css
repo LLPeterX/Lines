@@ -1,0 +1,11 @@
+.cyan {
+  background: -webkit-radial-gradient(30% 30%, circle, #5cabff, #000);
+  background: -moz-radial-gradient(30% 30%, circle, #5cabff, #000);
+  background: radial-gradient(30% 30%, circle, #5cabff, #000);
+}
+
+.red {
+  background: -webkit-radial-gradient(30% 30%, circle, #ff361b, #000);
+  background: -moz-radial-gradient(30% 30%, circle, #ff361b, #000);
+  background: radial-gradient(30% 30%, circle, #ff361b, #000);
+}

@@ -24,16 +24,18 @@
   color: white;
 }
 
-#board {
-  width: 634px;
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
+#board, table {
+  /* width: 634px; */
+  /* display: flex; */
+  /* flex-wrap: wrap; */
+  /* flex-direction: row; */
   border: 2px solid black;
   box-sizing: border-box;
+  padding: 0;
+  margin: 0;
 }
 
-.cell {
+.cell, td {
   box-sizing: border-box;
   border: 2px solid black;
   background-color: lightgray;
@@ -43,16 +45,18 @@
 
 .ball {
   display: inline-block;
-  position: absolute;
+  position: relative;
   border-radius: 50%;
-  height: 50px;
-  width: 50px;
+  height: 40px;
+  width: 40px;
+  top: 2px;
+  left: 2px;
   margin: 0;
   z-index: 1;
 }
 
 .cyan {
-  background: -webkit-radial-gradient(50% 50%, circle, #5cabff, #000);
-  background: -moz-radial-gradient(50% 50%, circle, #5cabff, #000);
-  background: radial-gradient(50% 50%, circle, #5cabff, #000);
+  background: -webkit-radial-gradient(30% 30%, circle, #5cabff, #000);
+  background: -moz-radial-gradient(30% 30%, circle, #5cabff, #000);
+  background: radial-gradient(30% 30%, circle, #5cabff, #000);
 }
