@@ -77,7 +77,7 @@ function placeRandomBalls(count) {
   }
 }
 
-// start
+// начало: после загрузки скриптов начинаем игру
 document.addEventListener('DOMContentLoaded', () => {
   elBoard = document.getElementById('board');
   cells = elBoard.getElementsByTagName("td");
