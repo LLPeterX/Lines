@@ -93,6 +93,21 @@ function stopBounce(y, x) {
   }
 }
 
+// переместить шарик из позиции (oldY, oldX) в (newY, newX)
+function moveTo(oldY, oldX, newY, newX) {
+  game[oldY][oldX] = 0;
+  game[newY][newX] = 1;
+  let oldCell = cells[oldY * ROWS + oldX];
+  let newCell = cells[newY * ROWS + newX];
+  let ball = oldCell.childNodes[0];
+  if (ball) {
+    let newBall = ball.cloneNode(false);
+    newCell.appendChild(newBall);
+    oldCell.childNodes[0]?.remove();
+  }
+
+}
+
 // начало: после загрузки скриптов начинаем игру
 document.addEventListener('DOMContentLoaded', () => {
   elBoard = document.getElementById('board');
