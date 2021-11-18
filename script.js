@@ -77,13 +77,28 @@ function placeRandomBalls(count) {
   }
 }
 
+function startBounce(y, x) {
+  let elCell = cells[y * ROWS + x];
+  let ball = elCell.childNodes[0];
+  if (ball) {
+    ball.classList.add('bounce');
+  }
+}
+
+function stopBounce(y, x) {
+  let elCell = cells[y * ROWS + x];
+  let ball = elCell.childNodes[0];
+  if (ball) {
+    ball.classList.remove('bounce');
+  }
+}
+
 // начало: после загрузки скриптов начинаем игру
 document.addEventListener('DOMContentLoaded', () => {
   elBoard = document.getElementById('board');
   cells = elBoard.getElementsByTagName("td");
 
   // размещаем сначала 5 случайных шариков
-  //placeRandomBalls(5);
   placeBall(0, 0, "red");
   placeBall(0, 1, "brown");
   placeBall(0, 2, "pink");
@@ -92,5 +107,6 @@ document.addEventListener('DOMContentLoaded', () => {
   placeBall(0, 5, "yellow");
   placeBall(0, 6, "cyan");
   placeRandomBalls(5);
+  startBounce(0, 1);
 
 });
