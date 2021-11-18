@@ -17,18 +17,13 @@ let timerId = null, timerSeconds = 0, elTimer = null;
 // Очистка игрового поля.
 // Удаляем все шарики и выставляем game[][]=0
 function clearBoard() {
-  console.log('clearBoard() cells=', cells, 'len=', cells.length);
   // удалить шарики из <td> (если есть)
   for (let i = 0; i < cells.length; i++) {
     if (cells.item(i).childNodes.length > 0) {
       cells.item(i).childNodes[0].remove();
     }
   }
-  // cells.forEach((node) => {
-  //   if (node.childNodes.length > 0) {
-  //     node.childNodes[0].remove();
-  //   }
-  // });
+  // очистить матрицу ходов
   for (let y = 0; y < ROWS; y++) {
     for (let x = 0; x < ROWS; x++) {
       game[y][x] = 0;
@@ -61,10 +56,9 @@ function removeBall(y, x) {
 function placeRandomBalls(count) {
   let freeCells = [];
   // свободные ячейки помещаем в массив freeCells
-  // ниже код по идее не нужен
   for (let y = 0; y < ROWS; y++) {
     for (let x = 0; x < ROWS; x++) {
-      if (!game[y][x]) {
+      if (game[y][x] == 0) {
         freeCells.push({ y, x });
       }
     }
@@ -85,8 +79,10 @@ function placeRandomBalls(count) {
     placeBall(y, x, color);
     game[y][x] = 1;
   }
+  return true;
 }
 
+// включить анимацию шарика
 function startBounce(y, x) {
   let elCell = cells[y * ROWS + x];
   let ball = elCell.childNodes[0];
@@ -97,6 +93,7 @@ function startBounce(y, x) {
   }
 }
 
+// выключить анимацию шарика
 function stopBounce() {
   if (bouncingBall) {
     let elCell = cells[bouncingBall[0] * ROWS + bouncingBall[1]];
@@ -120,20 +117,23 @@ function moveTo(oldY, oldX, newY, newX) {
     game[newY][newX] = 1;
     // если скачущий шарик перемещается, обновить его координаты в bouncingBall
     if (bouncingBall && bouncingBall[0] === oldY && bouncingBall[1] === oldX) {
-      bouncingBall = [newY, newX];
+      stopBounce();
+      //bouncingBall = [newY, newX];
+      startBounce(newY, newX);
     }
   }
 }
 
-
+// показать текущие значения часиков
 function updateTimer() {
   timerSeconds++;
   let seconds = timerSeconds % 60;
   let minutes = Math.floor(timerSeconds % 3600 / 60);
   let hours = Math.floor(timerSeconds / 3600);
   elTimer.innerText = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-
 }
+
+// сброс таймера
 function resetTimer() {
   if (!timerId) {
     clearInterval(timerId);
@@ -141,6 +141,36 @@ function resetTimer() {
   timerSeconds = 0;
   document.getElementById('time_container').innerText = '00:00:00';
   timerId = setInterval(updateTimer, 1000);
+}
+
+// обработчик клика на ячейку или шарик
+function handleClick(e) {
+  let clicked = e.target;
+  console.log('click on ', clicked);
+  if (clicked.classList.contains('ball')) {
+    // это шарик. Надо определить его координаты [y,x]
+    let y = clicked.parentNode.parentNode.rowIndex;
+    let x = clicked.parentNode.cellIndex;
+    console.log(' >>ball ', y, x);
+    stopBounce();
+    startBounce(y, x);
+  } else {
+    // это пустая ячейка. Если есть активный шарик, надо передвинуть его в эту ячейку (если можно)
+    let y = clicked.parentNode.rowIndex;
+    let x = clicked.cellIndex;
+    console.log(' >>cell ', y, x);
+    if (bouncingBall && (bouncingBall[0] != y || bouncingBall[1] != x)) {
+      // TODO: есть активный шарик. Надо найти кратчайший путь и передвинуть последовательно по нему ()
+      // для этого надо использовать алгоритм поиска кратчайшего пути (A*, Дейкстры или х.з.)
+
+      // let path = findPath(bouncingBall[0], bouncingBall[1], y, x)
+      //  if(path) ... перемещаем шарик последовательно по каждому элементу path[]
+      moveTo(bouncingBall[0], bouncingBall[1], y, x);
+
+    }
+    //stopBounce();
+
+  }
 }
 
 // начало игры: обнулить игоровое поле и таймер
@@ -155,6 +185,8 @@ document.addEventListener('DOMContentLoaded', () => {
   cells = elBoard.getElementsByTagName("td");
   elTimer = document.getElementById('time_container');
   elStatus = document.getElementById('status');
+
+  elBoard.addEventListener('click', handleClick);
 
   startGame();
   // размещаем сначала 5 случайных шариков
