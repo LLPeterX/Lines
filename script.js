@@ -6,19 +6,29 @@ const ROWS = 9; // число блоков (матрица NUM * NUM)
 const COLORS = ["red", "brown", "pink", "green", "blue", "yellow", "cyan"];
 
 let gameOver = false;
-const game = Array(ROWS).fill(0).map(_ => Array(ROWS).fill(0));
+const game = Array(ROWS).fill().map(_ => Array(ROWS).fill(0));
 let elBoad = null;
 let cells = null;
+let bouncingBall = null;
+let timerId = null, timerSeconds = 0, elTimer = null;
+
 
 
 // Очистка игрового поля.
 // Удаляем все шарики и выставляем game[][]=0
 function clearBoard() {
-  cells.forEach((node) => {
-    if (node.childNodes.length > 0) {
-      node.childNodes[0].remove();
+  console.log('clearBoard() cells=', cells, 'len=', cells.length);
+  // удалить шарики из <td> (если есть)
+  for (let i = 0; i < cells.length; i++) {
+    if (cells.item(i).childNodes.length > 0) {
+      cells.item(i).childNodes[0].remove();
     }
-  });
+  }
+  // cells.forEach((node) => {
+  //   if (node.childNodes.length > 0) {
+  //     node.childNodes[0].remove();
+  //   }
+  // });
   for (let y = 0; y < ROWS; y++) {
     for (let x = 0; x < ROWS; x++) {
       game[y][x] = 0;
@@ -82,37 +92,71 @@ function startBounce(y, x) {
   let ball = elCell.childNodes[0];
   if (ball) {
     ball.classList.add('bounce');
+    bouncingBall = [y, x];
+    console.log('set bounce=', bouncingBall);
   }
 }
 
-function stopBounce(y, x) {
-  let elCell = cells[y * ROWS + x];
-  let ball = elCell.childNodes[0];
-  if (ball) {
-    ball.classList.remove('bounce');
+function stopBounce() {
+  if (bouncingBall) {
+    let elCell = cells[bouncingBall[0] * ROWS + bouncingBall[1]];
+    let ball = elCell.childNodes[0];
+    if (ball) {
+      ball.classList.remove('bounce');
+    }
+    bouncingBall = null;
   }
 }
 
 // переместить шарик из позиции (oldY, oldX) в (newY, newX)
 function moveTo(oldY, oldX, newY, newX) {
-  game[oldY][oldX] = 0;
-  game[newY][newX] = 1;
   let oldCell = cells[oldY * ROWS + oldX];
   let newCell = cells[newY * ROWS + newX];
   let ball = oldCell.childNodes[0];
-  if (ball) {
-    let newBall = ball.cloneNode(false);
-    newCell.appendChild(newBall);
-    oldCell.childNodes[0]?.remove();
+  if (ball && newCell.childNodes.length === 0) {
+    newCell.appendChild(ball.cloneNode(false)); // поместить копию шарика в новые координаты
+    oldCell.childNodes[0]?.remove(); // удалить старый шарик
+    game[oldY][oldX] = 0;
+    game[newY][newX] = 1;
+    // если скачущий шарик перемещается, обновить его координаты в bouncingBall
+    if (bouncingBall && bouncingBall[0] === oldY && bouncingBall[1] === oldX) {
+      bouncingBall = [newY, newX];
+    }
   }
+}
 
+
+function updateTimer() {
+  timerSeconds++;
+  let seconds = timerSeconds % 60;
+  let minutes = Math.floor(timerSeconds % 3600 / 60);
+  let hours = Math.floor(timerSeconds / 3600);
+  elTimer.innerText = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+}
+function resetTimer() {
+  if (!timerId) {
+    clearInterval(timerId);
+  }
+  timerSeconds = 0;
+  document.getElementById('time_container').innerText = '00:00:00';
+  timerId = setInterval(updateTimer, 1000);
+}
+
+// начало игры: обнулить игоровое поле и таймер
+function startGame() {
+  clearBoard();
+  resetTimer();
 }
 
 // начало: после загрузки скриптов начинаем игру
 document.addEventListener('DOMContentLoaded', () => {
   elBoard = document.getElementById('board');
   cells = elBoard.getElementsByTagName("td");
+  elTimer = document.getElementById('time_container');
+  elStatus = document.getElementById('status');
 
+  startGame();
   // размещаем сначала 5 случайных шариков
   placeBall(0, 0, "red");
   placeBall(0, 1, "brown");
@@ -123,5 +167,10 @@ document.addEventListener('DOMContentLoaded', () => {
   placeBall(0, 6, "cyan");
   placeRandomBalls(5);
   startBounce(0, 1);
+  //setTimeout(() => stopBounce(1, 1), 3000);
+  setTimeout(stopBounce, 3000);
+  setTimeout(() => moveTo(0, 1, 1, 1), 2000);
+
+  //  startGame();
 
 });
