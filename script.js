@@ -11,7 +11,7 @@ let elBoad = null;
 let cells = null;
 let bouncingBall = null;
 let timerId = null, timerSeconds = 0, elTimer = null;
-
+let isMoving = false;
 
 
 // Очистка игрового поля.
@@ -88,7 +88,7 @@ function startBounce(y, x) {
   let ball = elCell.childNodes[0];
   if (ball) {
     ball.classList.add('bounce');
-    bouncingBall = [y, x];
+    bouncingBall = { y, x };
     console.log('set bounce=', bouncingBall);
   }
 }
@@ -96,7 +96,7 @@ function startBounce(y, x) {
 // выключить анимацию шарика
 function stopBounce() {
   if (bouncingBall) {
-    let elCell = cells[bouncingBall[0] * ROWS + bouncingBall[1]];
+    let elCell = cells[bouncingBall.y * ROWS + bouncingBall.x];
     let ball = elCell.childNodes[0];
     if (ball) {
       ball.classList.remove('bounce');
@@ -109,16 +109,25 @@ function stopBounce() {
 function moveTo(oldY, oldX, newY, newX) {
   let oldCell = cells[oldY * ROWS + oldX];
   let newCell = cells[newY * ROWS + newX];
+  // если кликнули по тому же шарику, прекратить прыгать и выход
+  if (oldX === newX && oldY === newY) {
+    stopBounce();
+    return;
+  }
+  let path = getPath(game, oldY, oldX, newY, newX);
+  console.log(`path from Y${oldY} X${oldX} to Y${newY} X${newX} is`);
+  console.log(path);
+  // TODO: переместить шарик в (newY, newX)
   let ball = oldCell.childNodes[0];
   if (ball && newCell.childNodes.length === 0) {
+    // тут продумать через getPath()
     newCell.appendChild(ball.cloneNode(false)); // поместить копию шарика в новые координаты
     oldCell.childNodes[0]?.remove(); // удалить старый шарик
     game[oldY][oldX] = 0;
     game[newY][newX] = 1;
     // если скачущий шарик перемещается, обновить его координаты в bouncingBall
-    if (bouncingBall && bouncingBall[0] === oldY && bouncingBall[1] === oldX) {
+    if (bouncingBall && bouncingBall.y === oldY && bouncingBall.x === oldX) {
       stopBounce();
-      //bouncingBall = [newY, newX];
       startBounce(newY, newX);
     }
   }
@@ -152,20 +161,24 @@ function handleClick(e) {
     let y = clicked.parentNode.parentNode.rowIndex;
     let x = clicked.parentNode.cellIndex;
     console.log(' >>ball ', y, x);
-    stopBounce();
-    startBounce(y, x);
+    if (bouncingBall.y == y && bouncingBall.x == x) {
+      stopBounce();
+    } else {
+      stopBounce();
+      startBounce(y, x);
+    }
   } else {
     // это пустая ячейка. Если есть активный шарик, надо передвинуть его в эту ячейку (если можно)
     let y = clicked.parentNode.rowIndex;
     let x = clicked.cellIndex;
     console.log(' >>cell ', y, x);
-    if (bouncingBall && (bouncingBall[0] != y || bouncingBall[1] != x)) {
+    if (bouncingBall && (bouncingBall.y != y || bouncingBall.x != x)) {
       // TODO: есть активный шарик. Надо найти кратчайший путь и передвинуть последовательно по нему ()
       // для этого надо использовать алгоритм поиска кратчайшего пути (A*, Дейкстры или х.з.)
 
       // let path = findPath(bouncingBall[0], bouncingBall[1], y, x)
       //  if(path) ... перемещаем шарик последовательно по каждому элементу path[]
-      moveTo(bouncingBall[0], bouncingBall[1], y, x);
+      moveTo(bouncingBall.y, bouncingBall.x, y, x);
 
     }
     //stopBounce();
@@ -200,8 +213,8 @@ document.addEventListener('DOMContentLoaded', () => {
   placeRandomBalls(5);
   startBounce(0, 1);
   //setTimeout(() => stopBounce(1, 1), 3000);
-  setTimeout(stopBounce, 3000);
-  setTimeout(() => moveTo(0, 1, 1, 1), 2000);
+  //setTimeout(stopBounce, 3000);
+  //setTimeout(() => moveTo(0, 1, 1, 1), 2000);
 
   //  startGame();
 
