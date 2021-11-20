@@ -35,7 +35,7 @@ function clearBoard() {
 function placeBall(y, x, color) {
   // получаем тег TD по координатам Y,X
   let elCell = cells[y * ROWS + x];
-  game[y][x] = 1;
+  game[y][x] = -1; // "занято" 0 нужно для последующего DFS
   let elBall = document.createElement("div");
   elBall.classList.add("ball");
   elBall.classList.add(color);
@@ -77,7 +77,7 @@ function placeRandomBalls(count) {
     let color = COLORS[Math.floor(Math.random() * COLORS.length)];
     console.log(` PLACE AT ${y} ${x} ${color}`);
     placeBall(y, x, color);
-    game[y][x] = 1;
+    game[y][x] = -1;
   }
   return true;
 }
