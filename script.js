@@ -131,6 +131,7 @@ function moveTo(oldY, oldX, newY, newX) {
       startBounce(newY, newX);
     }
   }
+  stopBounce(); // после перемещения отключить акт. шар
 }
 
 // показать текущие значения часиков
@@ -160,21 +161,19 @@ function handleClick(e) {
     // это шарик. Надо определить его координаты [y,x]
     let y = clicked.parentNode.parentNode.rowIndex;
     let x = clicked.parentNode.cellIndex;
-    console.log(' >>ball ', y, x);
-    if (bouncingBall.y == y && bouncingBall.x == x) {
+    console.log(' >> clk ball ', y, x);
+    if (bouncingBall) {
       stopBounce();
-    } else {
-      stopBounce();
-      startBounce(y, x);
     }
+    startBounce(y, x);
   } else {
     // это пустая ячейка. Если есть активный шарик, надо передвинуть его в эту ячейку (если можно)
     let y = clicked.parentNode.rowIndex;
     let x = clicked.cellIndex;
-    console.log(' >>cell ', y, x);
+    console.log(' >> emp cell ', y, x);
     if (bouncingBall && (bouncingBall.y != y || bouncingBall.x != x)) {
       // TODO: есть активный шарик. Надо найти кратчайший путь и передвинуть последовательно по нему ()
-      // для этого надо использовать алгоритм поиска кратчайшего пути (A*, Дейкстры или х.з.)
+      // для этого надо использовать getPath() => перенесно в moveTo()
 
       // let path = findPath(bouncingBall[0], bouncingBall[1], y, x)
       //  if(path) ... перемещаем шарик последовательно по каждому элементу path[]
