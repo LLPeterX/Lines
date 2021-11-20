@@ -3,17 +3,15 @@
  */
 
 
-function getPath(grid, startY, startX, endY, endX) {
+function getPath(game, startY, startX, endY, endX) {
+  const grid = JSON.parse(JSON.stringify(game)); // копия матрицы game, т.к. мы в ней будем изменять значения
   const queue = [{ x: startX, y: startY, value: 1 }];
   const SIZE = grid.length;
   grid[startY][startX] = 1;
   while (queue.length > 0) {
     let { x, y, value } = queue.shift();
     if (x === endX && y === endY) {
-      showGrid(grid);
-      //console.log(`found (Y=${y} X=${x} value=${value})`);
-      //showGrid(grid);
-      // строим обратный путь
+      // если достигли конца, то строим обратный путь
       let path = [{ x, y }];
       while (value > 1) {
         if (x > 0 && grid[y][x - 1] === value - 1) {
@@ -29,10 +27,8 @@ function getPath(grid, startY, startX, endY, endX) {
           value--;
           path.push({ x, y: ++y });
         }
-        //console.log(path);
       }
-      console.log('path=', path);
-      return path;
+      return path.reverse();
     }
     // добавляем соседей
     // left
@@ -59,7 +55,7 @@ function getPath(grid, startY, startX, endY, endX) {
   }
   return null;
 }
-
+/*
 function showGrid(grid) {
   let out = "";
   for (let y = 0; y < grid.length; y++) {
@@ -74,10 +70,10 @@ function showGrid(grid) {
     }
     out += "\n";
   }
-  console.log(out);
+  return out;
 }
 
-/*
+
 // debugging
 
 let grid = [
@@ -88,7 +84,6 @@ let grid = [
 ];
 
 showGrid(grid);
-console.log(getPath(grid, 0, 0, 2, 2));
-
+console.log('result=', getPath(grid, 0, 0, 2, 2));
 
  */
