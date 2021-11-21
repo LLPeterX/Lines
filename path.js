@@ -28,7 +28,8 @@ function getPath(game, startY, startX, endY, endX) {
           path.push({ x, y: ++y });
         }
       }
-      return path.reverse();
+      //return path.reverse();
+      return path;
     }
     // добавляем соседей
     // left
