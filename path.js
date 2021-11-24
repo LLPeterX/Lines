@@ -1,5 +1,6 @@
 /* 
 поиск кратчайшего маршрута - поиск в ширину
+*** НЕ РАБОТАЕТ ***
  */
 
 
@@ -13,24 +14,25 @@ function getPath(game, startY, startX, endY, endX) {
     if (x === endX && y === endY) {
       // если достигли конца, то строим обратный путь
       let path = [{ x, y }];
-      while (value > 1) {
+      while (value > 1) { // тут точно WHILE ???
         if (x > 0 && grid[y][x - 1] === value - 1) {
           value--;
-          path.push({ x: --x, y });
+          path.push({ x: x - 1, y });
         } else if (x + 1 < SIZE && grid[y][x + 1] === value - 1) {
           value--;
-          path.push({ x: ++x, y });
+          path.push({ x: x + 1, y });
         } else if (y > 0 && grid[y - 1][x] === value - 1) {
           value--;
-          path.push({ x, y: --y });
+          path.push({ x, y: y - 1 });
         } else if (y + 1 < SIZE && grid[y + 1][x] === value - 1) {
           value--;
-          path.push({ x, y: ++y });
+          path.push({ x, y: y + 1 });
         }
       }
       //return path.reverse();
       return path;
     }
+    // продолжаем заполнять
     // добавляем соседей
     // left
     if (x - 1 >= 0 && grid[y][x - 1] === 0) {
@@ -52,6 +54,7 @@ function getPath(game, startY, startX, endY, endX) {
       queue.push({ x: x, y: y + 1, value: value + 1 });
       grid[y + 1][x] = value + 1;
     }
+    //grid[y][x] = -1; // mark visited
 
   }
   return null;

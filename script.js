@@ -34,11 +34,17 @@ let oX, oY, _newX, _newY; // для анимации перемещения ша
 // Удаляем все шарики и выставляем game[][]=0
 function clearBoard() {
   // удалить шарики из <td> (если есть)
-  for (let i = 0; i < ROWS; i++) {
-    if (cells.item(i).childNodes.length > 0) {
-      cells.item(i).childNodes[0].remove();
+  // for (let i = 0; i < ROWS; i++) {
+  //   if (cells.item(i).childNodes.length > 0) {
+  //     cells.item(i).childNodes[0].remove();
+  //   }
+  //     game[i] = new Array(ROWS).fill(0);
+  //}
+  for (let y = 0; y < ROWS; y++) {
+    for (let x = 0; x < ROWS; x++) {
+      removeBall(y, x);
+      game[y][x] = 0;
     }
-    game[i] = new Array(ROWS).fill(0);
   }
 }
 
@@ -56,9 +62,7 @@ function placeBall(y, x, color) {
 // удаляем шарик по координатам Y,X
 function removeBall(y, x) {
   let elCell = cells[y * ROWS + x];
-  if (elCell.childNodes.length != 0) {
-    elCell.childNodes[0].remove();
-  }
+  elCell && elCell.childNodes.forEach(e => e.remove());
   game[y][x] = 0;
 }
 
@@ -127,14 +131,12 @@ function sleep(miliseconds) {
 // продумать рекурсию
 function moveTo(oldY, oldX, newY, newX) {
   // если кликнули по тому же шарику, прекратить прыгать и выход
-  //stopBounce();
+  stopBounce();
   if (oldX === newX && oldY === newY) {
-    stopBounce()
     return;
   }
   path = getPath(game, oldY, oldX, newY, newX);
-  if (!path) { // не пути
-    stopBounce();
+  if (!path || path.length < 2) { // нет 
     return;
   }
   oX = oldX;
@@ -164,8 +166,8 @@ function moveBall() {
   let oldCell = cells[oY * ROWS + oX]; // пред. ячейка
   let newCell = cells[y * ROWS + x]; // новая ячейка
   let ball = oldCell.childNodes[0].cloneNode(false);
+  removeBall(oY, oX);
   newCell.appendChild(ball);
-  oldCell.childNodes[0].remove(); // удалить старый шарик
   oY = y;
   oX = x;
   game[y][x] = 0;
@@ -195,12 +197,12 @@ function handleClick(e) {
     return;
   }
   let clicked = e.target;
-  if (clicked.classList.contains('ball')) {
+  if (clicked?.classList?.contains('ball')) {
     // это шарик. Надо определить его координаты [y,x]
     let y = clicked.parentNode.parentNode.rowIndex;
     let x = clicked.parentNode.cellIndex;
     startBounce(y, x);
-  } else if (clicked.childNodes[0]?.classList.contains('ball')) {
+  } else if (clicked.childNodes[0]?.classList?.contains('ball')) {
     // кликнули на ячейку с шариком, но промахнулись и попали на пустое место ячейки
     // определяем координаты шарика
     let y = clicked.parentNode.rowIndex;
