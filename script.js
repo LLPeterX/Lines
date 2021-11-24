@@ -25,6 +25,9 @@ let cells = null; // массив ячеек (тегов <TD>)
 let bouncingBall = null; // признак анимации шарика
 let timerId = null, timerSeconds = 0, elTimer = null;
 let isMoving = false; // признак, что шарик в процессе перемещения. Чтобы не обрабатывались клики, пока он движется
+let path = null;
+let animTimer = null;
+let oX, oY, _newX, _newY; // для анимации перемещения шарика
 
 
 // Очистка игрового поля.
@@ -37,12 +40,6 @@ function clearBoard() {
     }
     game[i] = new Array(ROWS).fill(0);
   }
-  // // очистить матрицу ходов
-  // for (let y = 0; y < ROWS; y++) {
-  //   for (let x = 0; x < ROWS; x++) {
-  //     game[y][x] = 0;
-  //   }
-  // }
 }
 
 // Разместить один новый шарик
@@ -130,37 +127,48 @@ function sleep(miliseconds) {
 // продумать рекурсию
 function moveTo(oldY, oldX, newY, newX) {
   // если кликнули по тому же шарику, прекратить прыгать и выход
-  stopBounce();
-  if (oldX === newX && oldY === newY) {
-    //stopBounce();
-    return;
-  }
-  let path = getPath(game, oldY, oldX, newY, newX);
-  if (!path) {
-    //stopBounce();
-    return;
-  }
-  //console.log(`path from (${oldY},${oldX}) to (${newY},${newX}) is`);
-  // переместить шарик в (newY, newX), двигаясь по path
-  path.pop(); // удаляем начальную точку - мы её и так знаем и находимся в ней
-  isMoving = true; // устанавливаем isMoving, чтобы предотвратить клики во время перемещения
-  //debugger;
-  let oX = oldX, oY = oldY;
-  while (path.length > 0) {
-    let { y, x } = path.pop();
-    let oldCell = cells[oY * ROWS + oX]; // пред. ячейка
-    let newCell = cells[y * ROWS + x]; // новая ячейка
-    oY = y;
-    oX = x;
-    let ball = oldCell.childNodes[0].cloneNode(false);
-    newCell.appendChild(ball);
-    oldCell.childNodes[0].remove(); // удалить старый шарик
-    //sleep(240);
-  } // end while
-  game[oldY][oldX] = 0;
-  game[newY][newX] = -1;
   //stopBounce();
-  isMoving = false;
+  if (oldX === newX && oldY === newY) {
+    stopBounce()
+    return;
+  }
+  path = getPath(game, oldY, oldX, newY, newX);
+  if (!path) { // не пути
+    stopBounce();
+    return;
+  }
+  oX = oldX;
+  oY = oldY;
+  game[oldY][oldX] = 0;
+  // переместить шарик в (newY, newX), двигаясь по path (path содержит начальную и конечную точки)
+  //let { oY, oX } = path.pop(); // удаляем начальную точку и получаем её координаты
+  isMoving = true; // устанавливаем isMoving, чтобы предотвратить клики во время перемещения
+  animTimer = setInterval(() => {
+    moveBall()
+  }, 180);
+  //game[oldY][oldX] = 0;
+  //game[newY][newX] = -1;
+
+}
+
+// переместить шарик из (oldY,oldX) в (_newY, _newX) (вызывается из таймера)
+function moveBall() {
+  let { y, x } = path.pop();
+  if (path.length === 0) {
+    clearInterval(animTimer);
+    stopBounce();
+    isMoving = false;
+    animTimer = null;
+    game[y][x] = -1;
+  }
+  let oldCell = cells[oY * ROWS + oX]; // пред. ячейка
+  let newCell = cells[y * ROWS + x]; // новая ячейка
+  let ball = oldCell.childNodes[0].cloneNode(false);
+  newCell.appendChild(ball);
+  oldCell.childNodes[0].remove(); // удалить старый шарик
+  oY = y;
+  oX = x;
+  game[y][x] = 0;
 }
 
 // показать текущие значения часиков
@@ -191,7 +199,6 @@ function handleClick(e) {
     // это шарик. Надо определить его координаты [y,x]
     let y = clicked.parentNode.parentNode.rowIndex;
     let x = clicked.parentNode.cellIndex;
-    //console.log(' >> clk ball ', y, x);
     startBounce(y, x);
   } else if (clicked.childNodes[0]?.classList.contains('ball')) {
     // кликнули на ячейку с шариком, но промахнулись и попали на пустое место ячейки
@@ -203,7 +210,6 @@ function handleClick(e) {
     // это пустая ячейка. Если есть активный шарик, надо передвинуть его в эту ячейку (если можно)
     let y = clicked.parentNode.rowIndex;
     let x = clicked.cellIndex;
-    //console.log(' >> emp cell ', y, x);
     if (bouncingBall && (bouncingBall.y != y || bouncingBall.x != x)) {
       moveTo(bouncingBall.y, bouncingBall.x, y, x);
     }
