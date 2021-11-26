@@ -19,7 +19,6 @@ const ROWS = 9; // число ячеек в строке (матрица ROWS * 
 const COLORS = ["red", "brown", "pink", "green", "blue", "yellow", "cyan"];
 
 let gameOver = false; // признак, что игра закончена (нет свободных ячеек для размещения новых шариков)
-//let game = Array(ROWS).fill().map(_ => Array(ROWS).fill(0)); // игровая матрица для поиска пути
 let game = null;
 let elBoad = null; // таблица с ячейками (<TABLE>)
 let elScore, elTimer;
@@ -62,7 +61,7 @@ function placeBall(y, x, color = null) {
   elCell.appendChild(elBall);
 }
 
-// удаляем шарик по координатам Y,X
+// удаляем шарик по координатам (Y,X)
 function removeBall(y, x) {
   let elCell = cells[y * ROWS + x];
   elCell && elCell.childNodes.forEach(e => e.remove());
@@ -71,7 +70,7 @@ function removeBall(y, x) {
 
 // разместить count случайных шариков
 // в начале игры - 5 штук, после каждого хода по 3 шт.
-function placeRandomBalls(count = 5, color = null) {
+function placeRandomBalls(count = 3, color = null) {
   let freeCells = [];
   // свободные ячейки помещаем в массив freeCells
   for (let y = 0; y < ROWS; y++) {
@@ -94,6 +93,8 @@ function placeRandomBalls(count = 5, color = null) {
     placeBall(y, x, color);
     game[y][x] = -1;
   }
+  // проверить - появились ли 5 шариков в ряд
+  findAndRemove5balls(5);
   return true;
 }
 
@@ -105,7 +106,6 @@ function startBounce(y, x) {
   if (ball) {
     ball.classList.add('bounce');
     bouncingBall = { y, x };
-    //console.log('set bounce=', bouncingBall);
   }
 }
 
@@ -137,7 +137,6 @@ function moveTo(oldY, oldX, newY, newX) {
   oY = oldY;
   game[oldY][oldX] = 0;
   // переместить шарик в (newY, newX), двигаясь по path (path содержит начальную и конечную точки)
-  //let { oY, oX } = path.pop(); // удаляем начальную точку и получаем её координаты
   isMoving = true; // устанавливаем isMoving, чтобы предотвратить клики во время перемещения. Сброс внутри moveBall() в конечной точке
   animTimer = setInterval(() => {
     moveBall()
@@ -190,6 +189,7 @@ function resetTimer() {
 /* 
 findAndRemove5balls() - найти и удалить 5 последовательных шариков одного цвета
 Если нашли - удалить и вернуть true, иначе вернуть false
+- используем внешнюю функцию find5() - получить массив удаляемых шариков
  */
 function findAndRemove5balls() {
   let grid = Array(ROWS).fill().map(_ => Array(ROWS).fill(null));
@@ -202,16 +202,21 @@ function findAndRemove5balls() {
   // удаляем шарики по координатам из ballsToRemove {y,x}
   if (ballsToRemove) {
     ballsToRemove.forEach(({ y, x }) => removeBall(y, x));
-    updateScore(ballsToRemove.length);
+    updateScore(ballsToRemove.length); // плюсуем к счету кол-во удаленных
     return true;
   }
   return false;
 
 }
 
+function setScore(num) {
+  elScore.innerText = num;
+}
+
+// обновить кол-во очков
 function updateScore(points) {
   score += points;
-  elScore.innerText = score;
+  setScore(score);
 }
 
 // обработчик клика на ячейку или шарик
@@ -226,19 +231,17 @@ function handleClick(e) {
     let x = clicked.parentNode.cellIndex;
     startBounce(y, x);
   } else if (clicked.childNodes[0]?.classList?.contains('ball')) {
-    // кликнули на ячейку с шариком, но промахнулись и попали на пустое место ячейки
-    // определяем координаты шарика
+    // не шарик, но ячейка с шариком (промахнулись и попали на пустое место ячейки)
     let y = clicked.parentNode.rowIndex;
     let x = clicked.cellIndex;
     startBounce(y, x);
   } else {
-    // это пустая ячейка. Если есть активный шарик, надо передвинуть его в эту ячейку (если можно)
+    // это пустая ячейка. Если есть активный шарик, надо передвинуть его в нё
     let y = clicked.parentNode.rowIndex;
     let x = clicked.cellIndex;
     if (bouncingBall && (bouncingBall.y != y || bouncingBall.x != x)) {
       moveTo(bouncingBall.y, bouncingBall.x, y, x);
     }
-
   }
 }
 
@@ -246,6 +249,7 @@ function handleClick(e) {
 function startGame() {
   clearBoard();
   resetTimer();
+  setScore(0);
 }
 
 // начало: после загрузки скриптов начинаем игру
