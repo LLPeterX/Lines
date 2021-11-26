@@ -22,13 +22,15 @@ let gameOver = false; // признак, что игра закончена (н�
 //let game = Array(ROWS).fill().map(_ => Array(ROWS).fill(0)); // игровая матрица для поиска пути
 let game = null;
 let elBoad = null; // таблица с ячейками (<TABLE>)
+let elScore, elTimer;
 let cells = null; // массив ячеек (тегов <TD>)
 let bouncingBall = null; // признак анимации шарика
-let timerId = null, timerSeconds = 0, elTimer = null;
+let timerId = null, timerSeconds = 0;
 let isMoving = false; // признак, что шарик в процессе перемещения. Чтобы не обрабатывались клики, пока он движется
 let path = null;
 let animTimer = null;
 let oX, oY, _newX, _newY; // для анимации перемещения шарика
+let score = 0;
 
 
 // Очистка игрового поля.
@@ -181,7 +183,7 @@ function resetTimer() {
     clearInterval(timerId);
   }
   timerSeconds = 0;
-  document.getElementById('time_container').innerText = '00:00:00';
+  elTimer.innerText = '00:00:00';
   timerId = setInterval(updateTimer, 1000);
 }
 
@@ -200,10 +202,16 @@ function findAndRemove5balls() {
   // удаляем шарики по координатам из ballsToRemove {y,x}
   if (ballsToRemove) {
     ballsToRemove.forEach(({ y, x }) => removeBall(y, x));
+    updateScore(ballsToRemove.length);
     return true;
   }
   return false;
 
+}
+
+function updateScore(points) {
+  score += points;
+  elScore.innerText = score;
 }
 
 // обработчик клика на ячейку или шарик
@@ -246,6 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
   cells = elBoard.getElementsByTagName("td");
   elTimer = document.getElementById('time_container');
   elStatus = document.getElementById('status');
+  elScore = document.getElementById('score');
 
   elBoard.addEventListener('click', handleClick);
 

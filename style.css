@@ -12,9 +12,10 @@
   align-items: center;
 }
 
-#time_container {
+#time_container, #score {
+  width: 150px;
   margin: 20px;
-  font-size: 30pt;
+  font-size: 20pt;
   font-family: 'Courier New', Courier, monospace;
   font-weight: 900;
   padding: 20px;
@@ -24,11 +25,21 @@
   color: white;
 }
 
+/* #score {
+  width: 100px;
+  margin: 20px;
+  font-size: 30pt;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 900;
+  padding: 20px;
+  border: 5px solid black;
+  border-radius: 16px;
+  background-color: black;
+  color: white;
+} */
+
+
 #board, table {
-  /* width: 634px; */
-  /* display: flex; */
-  /* flex-wrap: wrap; */
-  /* flex-direction: row; */
   border: 2px solid black;
   box-sizing: border-box;
   padding: 0;
@@ -55,3 +66,8 @@
   z-index: 1;
 }
 
+.score_timer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
