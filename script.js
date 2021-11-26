@@ -19,7 +19,8 @@ const ROWS = 9; // число ячеек в строке (матрица ROWS * 
 const COLORS = ["red", "brown", "pink", "green", "blue", "yellow", "cyan"];
 
 let gameOver = false; // признак, что игра закончена (нет свободных ячеек для размещения новых шариков)
-const game = Array(ROWS).fill().map(_ => Array(ROWS).fill(0)); // игровая матрица для поиска пути
+//let game = Array(ROWS).fill().map(_ => Array(ROWS).fill(0)); // игровая матрица для поиска пути
+let game = null;
 let elBoad = null; // таблица с ячейками (<TABLE>)
 let cells = null; // массив ячеек (тегов <TD>)
 let bouncingBall = null; // признак анимации шарика
@@ -33,29 +34,29 @@ let oX, oY, _newX, _newY; // для анимации перемещения ша
 // Очистка игрового поля.
 // Удаляем все шарики и выставляем game[][]=0
 function clearBoard() {
-  // удалить шарики из <td> (если есть)
-  // for (let i = 0; i < ROWS; i++) {
-  //   if (cells.item(i).childNodes.length > 0) {
-  //     cells.item(i).childNodes[0].remove();
-  //   }
-  //     game[i] = new Array(ROWS).fill(0);
-  //}
-  for (let y = 0; y < ROWS; y++) {
-    for (let x = 0; x < ROWS; x++) {
-      removeBall(y, x);
-      game[y][x] = 0;
+  let allBalls = document.getElementsByClassName("ball");
+  if (allBalls) {
+    for (let i = 0; i < allBalls.length; i++) {
+      allBalls[i].remove();
     }
   }
+  game = Array(ROWS).fill().map(_ => Array(ROWS).fill(0)); // игровая матрица для поиска пути
+
 }
 
 // Разместить один новый шарик
-function placeBall(y, x, color) {
+// если color = null, то выьрать случайный цвет
+function placeBall(y, x, color = null) {
   // получаем тег TD по координатам Y,X
   let elCell = cells[y * ROWS + x];
   game[y][x] = -1; // "занято" 0 нужно для последующего DFS
   let elBall = document.createElement("div");
   elBall.classList.add("ball");
+  if (!color) {
+    color = COLORS[Math.floor(Math.random() * COLORS.length)];
+  }
   elBall.classList.add(color);
+  elBall.setAttribute('data-color', color);
   elCell.appendChild(elBall);
 }
 
@@ -68,7 +69,7 @@ function removeBall(y, x) {
 
 // разместить count случайных шариков
 // в начале игры - 5 штук, после каждого хода по 3 шт.
-function placeRandomBalls(count) {
+function placeRandomBalls(count, color = null) {
   let freeCells = [];
   // свободные ячейки помещаем в массив freeCells
   for (let y = 0; y < ROWS; y++) {
@@ -87,10 +88,7 @@ function placeRandomBalls(count) {
   let remains = count; // кол-во свободных ячеек
   while (remains-- > 0 && freeCells.length > 0) {
     let i = Math.floor(Math.random() * freeCells.length);
-    let { y, x } = freeCells.splice(i, 1)[0];
-    // случайный цвет
-    let color = COLORS[Math.floor(Math.random() * COLORS.length)];
-    //console.log(` PLACE AT ${y} ${x} ${color}`);
+    let { y, x } = freeCells.splice(i, 1)[0]; // удаляем выбранную ячейку
     placeBall(y, x, color);
     game[y][x] = -1;
   }
@@ -121,12 +119,6 @@ function stopBounce() {
   }
 }
 
-// пауза перемещении шарика
-function sleep(miliseconds) {
-  let currentTime = new Date().getTime();
-  while (currentTime + miliseconds >= new Date().getTime());
-}
-
 // переместить шарик из позиции (oldY, oldX) в (newY, newX)
 // продумать рекурсию
 function moveTo(oldY, oldX, newY, newX) {
@@ -136,7 +128,7 @@ function moveTo(oldY, oldX, newY, newX) {
     return;
   }
   path = getPath(game, oldY, oldX, newY, newX);
-  if (!path || path.length < 2) { // нет 
+  if (!path || path.length < 2) { // нет пути
     return;
   }
   oX = oldX;
@@ -144,25 +136,17 @@ function moveTo(oldY, oldX, newY, newX) {
   game[oldY][oldX] = 0;
   // переместить шарик в (newY, newX), двигаясь по path (path содержит начальную и конечную точки)
   //let { oY, oX } = path.pop(); // удаляем начальную точку и получаем её координаты
-  isMoving = true; // устанавливаем isMoving, чтобы предотвратить клики во время перемещения
+  isMoving = true; // устанавливаем isMoving, чтобы предотвратить клики во время перемещения. Сброс внутри moveBall() в конечной точке
   animTimer = setInterval(() => {
     moveBall()
-  }, 180);
-  //game[oldY][oldX] = 0;
-  //game[newY][newX] = -1;
+  }, 110);
 
 }
 
-// переместить шарик из (oldY,oldX) в (_newY, _newX) (вызывается из таймера)
+// переместить шарик из (oY,oX) в (_newY, _newX) (вызывается из таймера)
 function moveBall() {
   let { y, x } = path.pop();
-  if (path.length === 0) {
-    clearInterval(animTimer);
-    stopBounce();
-    isMoving = false;
-    animTimer = null;
-    game[y][x] = -1;
-  }
+
   let oldCell = cells[oY * ROWS + oX]; // пред. ячейка
   let newCell = cells[y * ROWS + x]; // новая ячейка
   let ball = oldCell.childNodes[0].cloneNode(false);
@@ -170,7 +154,14 @@ function moveBall() {
   newCell.appendChild(ball);
   oY = y;
   oX = x;
-  game[y][x] = 0;
+  if (path.length === 0) {
+    clearInterval(animTimer);
+    // stopBounce();
+    isMoving = false;
+    animTimer = null;
+    game[y][x] = -1;
+    findAndRemove5balls();
+  }
 }
 
 // показать текущие значения часиков
@@ -189,6 +180,20 @@ function resetTimer() {
   timerSeconds = 0;
   document.getElementById('time_container').innerText = '00:00:00';
   timerId = setInterval(updateTimer, 1000);
+}
+
+/* 
+findAndRemove5balls() - найти и удалить 5 последовательных шариков одного цвета
+ */
+function findAndRemove5balls() {
+  let grid = Array(ROWS).fill().map(_ => Array(ROWS).fill(null));
+  game.map((col, y) => col.map((_, x) => {
+    if (game[y][x] === -1) {
+      grid[y][x] = cells[y * ROWS + x].childNodes[0]?.getAttribute('data-color');
+    }
+  }));
+  showGrid2(grid);
+
 }
 
 // обработчик клика на ячейку или шарик
@@ -244,11 +249,12 @@ document.addEventListener('DOMContentLoaded', () => {
   placeBall(0, 5, "yellow");
   placeBall(0, 6, "cyan");
   placeRandomBalls(5);
+  //placeRandomBalls(5, 'red');
   startBounce(0, 1);
-  //setTimeout(() => stopBounce(1, 1), 3000);
-  //setTimeout(stopBounce, 3000);
-  //setTimeout(() => moveTo(0, 1, 1, 1), 2000);
-
-  //  startGame();
 
 });
+
+function showGrid2(grid) {
+  let out = grid.map(col => col.map(cell => cell ? String(cell).slice(0, 4).padEnd(4) : '____'));
+  console.log(out);
+}
