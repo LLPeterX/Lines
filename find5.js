@@ -14,8 +14,13 @@
 
 function find5(grid, maxCount = 5) {
   const SIZE = grid.length;
-  let path = [];
+  let path = new Set();
   let count, x1, y1, currentPath;
+
+  // сет состоит их ключей {Y}x{x}
+  function add5(arr) {
+    arr.forEach(({ x, y }) => path.add(`${y}x${x}`));
+  }
 
   for (let y = 0; y < SIZE; y++) {
     for (let x = 0; x < SIZE; x++) {
@@ -31,7 +36,7 @@ function find5(grid, maxCount = 5) {
         x1++;
       }
       if (count >= maxCount - 1) {
-        path.push(currentPath);
+        add5(currentPath);
       }
       // по вертикали
       count = 0, y1 = y + 1, currentPath = [{ x, y }];
@@ -41,7 +46,7 @@ function find5(grid, maxCount = 5) {
         y1++;
       }
       if (count >= maxCount - 1) {
-        path.push(currentPath);
+        add5(currentPath);
       }
       // по диагонали /
       count = 0, y1 = y + 1, x1 = x - 1, currentPath = [{ x, y }];
@@ -53,7 +58,7 @@ function find5(grid, maxCount = 5) {
 
       }
       if (count >= maxCount - 1) {
-        path.push(currentPath);
+        add5(currentPath);
       }
       // по диагонали \
       count = 0, y1 = y + 1, x1 = x + 1, currentPath = [{ x, y }];
@@ -65,12 +70,15 @@ function find5(grid, maxCount = 5) {
 
       }
       if (count >= maxCount - 1) {
-        path.push(currentPath);
+        add5(currentPath);
       }
 
     } // for x
   } // for y
-  return path;
+  return path.size > 0 ? [...path].map(e => {
+    let [y, x] = e.split('x').map(Number)
+    return { y, x };
+  }) : null;
 
 }
 
@@ -78,9 +86,9 @@ function find5(grid, maxCount = 5) {
 // debug
 
 const grid = [
-  ['v', 0, 0, 0],
-  [0, 'v', 0, 0],
-  [0, 0, 'v', 0],
+  [null, 0, 0, 0],
+  [0, 'v', null, 0],
+  [0, 'v', 'v', 'v'],
   [0, 0, 0, 'v'],
 ];
 
