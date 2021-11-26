@@ -69,7 +69,7 @@ function removeBall(y, x) {
 
 // разместить count случайных шариков
 // в начале игры - 5 штук, после каждого хода по 3 шт.
-function placeRandomBalls(count, color = null) {
+function placeRandomBalls(count = 5, color = null) {
   let freeCells = [];
   // свободные ячейки помещаем в массив freeCells
   for (let y = 0; y < ROWS; y++) {
@@ -139,7 +139,7 @@ function moveTo(oldY, oldX, newY, newX) {
   isMoving = true; // устанавливаем isMoving, чтобы предотвратить клики во время перемещения. Сброс внутри moveBall() в конечной точке
   animTimer = setInterval(() => {
     moveBall()
-  }, 110);
+  }, 90);
 
 }
 
@@ -154,13 +154,16 @@ function moveBall() {
   newCell.appendChild(ball);
   oY = y;
   oX = x;
-  if (path.length === 0) {
+  if (path.length === 0) { // переместили шарик. 
     clearInterval(animTimer);
     // stopBounce();
     isMoving = false;
     animTimer = null;
     game[y][x] = -1;
-    findAndRemove5balls();
+    // если при следующем ходе не удалили ряд из 5 шариков, добавить еще 3 штуки
+    if (!findAndRemove5balls()) {
+      placeRandomBalls(3);
+    }
   }
 }
 
@@ -184,6 +187,7 @@ function resetTimer() {
 
 /* 
 findAndRemove5balls() - найти и удалить 5 последовательных шариков одного цвета
+Если нашли - удалить и вернуть true, иначе вернуть false
  */
 function findAndRemove5balls() {
   let grid = Array(ROWS).fill().map(_ => Array(ROWS).fill(null));
@@ -192,7 +196,13 @@ function findAndRemove5balls() {
       grid[y][x] = cells[y * ROWS + x].childNodes[0]?.getAttribute('data-color');
     }
   }));
-  showGrid2(grid);
+  let ballsToRemove = find5(grid);
+  // удаляем шарики по координатам из ballsToRemove {y,x}
+  if (ballsToRemove) {
+    ballsToRemove.forEach(({ y, x }) => removeBall(y, x));
+    return true;
+  }
+  return false;
 
 }
 

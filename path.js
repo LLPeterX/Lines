@@ -5,11 +5,11 @@
 
 
 function getPath(game, startY, startX, endY, endX) {
-  console.log("start game:");
-  showGrid(game);
+  //console.log("start game:");
+  //showGrid(game);
   const grid = JSON.parse(JSON.stringify(game)); // копия матрицы game, т.к. мы в ней будем изменять значения
-  console.log("start grid:");
-  showGrid(grid);
+  //console.log("start grid:");
+  //showGrid(grid);
   const queue = [{ x: startX, y: startY, value: 1 }];
   const SIZE = grid.length;
   const MAX_ATTEMPTS = 1000; // макс. кол-во итераций
@@ -18,7 +18,7 @@ function getPath(game, startY, startX, endY, endX) {
   while (queue.length > 0 && attempt++ < MAX_ATTEMPTS) {
     let { x, y, value } = queue.shift();
     if (x === endX && y === endY) {
-      showGrid(grid);
+      //showGrid(grid);
       // если достигли конца, то строим обратный путь
       let path = [{ x, y }];
       //debugger;
