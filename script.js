@@ -37,17 +37,6 @@ let score = 0;
 // Очистка игрового поля.
 // Удаляем все шарики и выставляем game[][]=0
 function clearBoard() {
-  //debugger;
-  // почему-то так не работает
-  //let allBalls = document.getElementsByClassName("ball");
-  //for (let i = 0; i < allBalls.length; i++) {
-  //    allBalls[i].remove();
-  //}
-  //for (let ball of allBalls) ball.remove();
-
-
-  // clear game field
-  //game = Array(ROWS).fill().map(_ => Array(ROWS).fill(0)); // игровая матрица для поиска пути
   for (let y = 0; y < ROWS; y++) {
     for (let x = 0; x < ROWS; x++) {
       removeBall(y, x);
@@ -158,7 +147,7 @@ function moveTo(oldY, oldX, newY, newX) {
 
 }
 
-// переместить шарик из (oY,oX) в (_newY, _newX) (вызывается из таймера)
+// сделать один ход из (oY,oX) в (_newY, _newX) (вызывается из таймера)
 function moveBall() {
   let { y, x } = path.pop();
 
@@ -300,18 +289,6 @@ document.addEventListener('DOMContentLoaded', () => {
   elButton.addEventListener('click', startGame);
 
   startGame();
-  // for test
-  placeRandomBalls(70);
-
-  /*   // размещаем сначала 5 случайных шариков
-    // тест: щарики всех цветов
-    for (let i = 0; i < COLORS.length; i++) {
-      placeBall(0, i, COLORS[i]);
-    }
-    placeRandomBalls(5);
-    //placeRandomBalls(5, 'red');
-    startBounce(0, 1);
-   */
 });
 
 function showGrid2(grid) {
