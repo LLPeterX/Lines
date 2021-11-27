@@ -24,7 +24,7 @@ let elBoad = null; // таблица с ячейками (<TABLE>)
 let elScore, elTimer;
 let cells = null; // массив ячеек (тегов <TD>)
 let bouncingBall = null; // признак анимации шарика
-let timerId = null, timerSeconds = 0;
+let timerId = null, startTime, timerSeconds, lastTime = Date.now();
 let isMoving = false; // признак, что шарик в процессе перемещения. Чтобы не обрабатывались клики, пока он движется
 let path = null;
 let animTimer = null;
@@ -36,10 +36,8 @@ let score = 0;
 // Удаляем все шарики и выставляем game[][]=0
 function clearBoard() {
   let allBalls = document.getElementsByClassName("ball");
-  if (allBalls) {
-    for (let i = 0; i < allBalls.length; i++) {
-      allBalls[i].remove();
-    }
+  for (let i = 0; i < allBalls.length; i++) {
+    allBalls[i].remove();
   }
   game = Array(ROWS).fill().map(_ => Array(ROWS).fill(0)); // игровая матрица для поиска пути
 
@@ -170,11 +168,14 @@ function moveBall() {
 
 // показать текущие значения часиков
 function updateTimer() {
-  timerSeconds++;
-  let seconds = timerSeconds % 60;
-  let minutes = Math.floor(timerSeconds % 3600 / 60);
-  let hours = Math.floor(timerSeconds / 3600);
-  elTimer.innerText = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  let newTime = Date.now();
+  if (newTime - lastTime > 1000) {
+    timerSeconds = Math.floor((newTime - startTime) / 1000); // seconds
+    let seconds = timerSeconds % 60;
+    let minutes = Math.floor(timerSeconds % 3600 / 60);
+    let hours = Math.floor(timerSeconds / 3600);
+    elTimer.innerText = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  }
 }
 // сброс таймера
 function resetTimer() {
@@ -182,6 +183,7 @@ function resetTimer() {
     clearInterval(timerId);
   }
   timerSeconds = 0;
+  lastTime = startTime = Date.now();
   elTimer.innerText = '00:00:00';
   timerId = setInterval(updateTimer, 1000);
 }
@@ -251,7 +253,9 @@ function startGame() {
   resetTimer();
   score = 0;
   setScore(0);
+  placeRandomBalls(5);
 }
+
 
 // начало: после загрузки скриптов начинаем игру
 document.addEventListener('DOMContentLoaded', () => {
@@ -260,19 +264,22 @@ document.addEventListener('DOMContentLoaded', () => {
   elTimer = document.getElementById('time_container');
   elStatus = document.getElementById('status');
   elScore = document.getElementById('score');
+  elButton = document.getElementById('restart');
 
   elBoard.addEventListener('click', handleClick);
+  elButton.addEventListener('click', startGame);
 
   startGame();
-  // размещаем сначала 5 случайных шариков
-  // тест: щарики всех цветов
-  for (let i = 0; i < COLORS.length; i++) {
-    placeBall(0, i, COLORS[i]);
-  }
-  placeRandomBalls(5);
-  //placeRandomBalls(5, 'red');
-  startBounce(0, 1);
 
+  /*   // размещаем сначала 5 случайных шариков
+    // тест: щарики всех цветов
+    for (let i = 0; i < COLORS.length; i++) {
+      placeBall(0, i, COLORS[i]);
+    }
+    placeRandomBalls(5);
+    //placeRandomBalls(5, 'red');
+    startBounce(0, 1);
+   */
 });
 
 function showGrid2(grid) {

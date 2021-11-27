@@ -57,3 +57,13 @@
   height: 50px;
 }
 
+#controls {
+  margin-top: 10px;
+}
+
+#restart {
+  font-size: 20pt;
+  padding: 10px 20px 10px 20px;
+  border-radius: 10px;
+  border-color: blue;
+}
