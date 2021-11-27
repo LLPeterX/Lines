@@ -155,7 +155,7 @@ function moveBall() {
   newCell.appendChild(ball);
   oY = y;
   oX = x;
-  if (path.length === 0) { // переместили шарик. 
+  if (path.length === 0) { // достигли финальной точки
     clearInterval(animTimer);
     // stopBounce();
     isMoving = false;
@@ -249,6 +249,7 @@ function handleClick(e) {
 function startGame() {
   clearBoard();
   resetTimer();
+  score = 0;
   setScore(0);
 }
 
@@ -264,13 +265,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   startGame();
   // размещаем сначала 5 случайных шариков
-  placeBall(0, 0, "red");
-  placeBall(0, 1, "brown");
-  placeBall(0, 2, "pink");
-  placeBall(0, 3, "green");
-  placeBall(0, 4, "blue");
-  placeBall(0, 5, "yellow");
-  placeBall(0, 6, "cyan");
+  // тест: щарики всех цветов
+  for (let i = 0; i < COLORS.length; i++) {
+    placeBall(0, i, COLORS[i]);
+  }
   placeRandomBalls(5);
   //placeRandomBalls(5, 'red');
   startBounce(0, 1);

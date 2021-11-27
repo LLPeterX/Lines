@@ -25,20 +25,6 @@
   color: white;
 }
 
-/* #score {
-  width: 100px;
-  margin: 20px;
-  font-size: 30pt;
-  font-family: 'Courier New', Courier, monospace;
-  font-weight: 900;
-  padding: 20px;
-  border: 5px solid black;
-  border-radius: 16px;
-  background-color: black;
-  color: white;
-} */
-
-
 #board, table {
   border: 2px solid black;
   box-sizing: border-box;
@@ -52,18 +38,6 @@
   background-color: lightgray;
   width: 50px;
   height: 50px;
-}
-
-.ball {
-  display: inline-block;
-  position: relative;
-  border-radius: 50%;
-  height: 40px;
-  width: 40px;
-  top: 2px;
-  left: 2px;
-  margin: 0;
-  z-index: 1;
 }
 
 .score_timer {
