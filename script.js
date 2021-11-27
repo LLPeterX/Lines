@@ -254,6 +254,8 @@ function startGame() {
   score = 0;
   setScore(0);
   placeRandomBalls(5);
+  isMoving = false;
+  gameOver = false;
 }
 
 
