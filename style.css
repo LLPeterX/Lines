@@ -67,3 +67,17 @@
   border-radius: 10px;
   border-color: blue;
 }
+
+#gameover {
+  display: none;
+  position: absolute;
+  margin: 0 auto;
+  padding: 30px;
+  font-weight: bold;
+  color: red;
+  border: 2px solid red;
+  border-radius: 10px;
+  font-size: 30pt;
+  z-index: 3;
+  background-color: white;
+}

@@ -19,9 +19,11 @@ const ROWS = 9; // число ячеек в строке (матрица ROWS * 
 const COLORS = ["red", "brown", "pink", "green", "blue", "yellow", "cyan"];
 
 let gameOver = false; // признак, что игра закончена (нет свободных ячеек для размещения новых шариков)
-let game = null;
+//let game = [ROWS][ROWS];
+let game = Array(ROWS).fill().map(_ => Array(ROWS).fill(0)); // игровая матрица для поиска пути
 let elBoad = null; // таблица с ячейками (<TABLE>)
 let elScore, elTimer;
+let elGameOver;
 let cells = null; // массив ячеек (тегов <TD>)
 let bouncingBall = null; // признак анимации шарика
 let timerId = null, startTime, timerSeconds, lastTime = Date.now();
@@ -35,11 +37,23 @@ let score = 0;
 // Очистка игрового поля.
 // Удаляем все шарики и выставляем game[][]=0
 function clearBoard() {
-  let allBalls = document.getElementsByClassName("ball");
-  for (let i = 0; i < allBalls.length; i++) {
-    allBalls[i].remove();
+  //debugger;
+  // почему-то так не работает
+  //let allBalls = document.getElementsByClassName("ball");
+  //for (let i = 0; i < allBalls.length; i++) {
+  //    allBalls[i].remove();
+  //}
+  //for (let ball of allBalls) ball.remove();
+
+
+  // clear game field
+  //game = Array(ROWS).fill().map(_ => Array(ROWS).fill(0)); // игровая матрица для поиска пути
+  for (let y = 0; y < ROWS; y++) {
+    for (let x = 0; x < ROWS; x++) {
+      removeBall(y, x);
+      game[y][x] = 0;
+    }
   }
-  game = Array(ROWS).fill().map(_ => Array(ROWS).fill(0)); // игровая матрица для поиска пути
 
 }
 
@@ -69,6 +83,7 @@ function removeBall(y, x) {
 // разместить count случайных шариков
 // в начале игры - 5 штук, после каждого хода по 3 шт.
 function placeRandomBalls(count = 3, color = null) {
+  if (isMoving) return;
   let freeCells = [];
   // свободные ячейки помещаем в массив freeCells
   for (let y = 0; y < ROWS; y++) {
@@ -81,6 +96,8 @@ function placeRandomBalls(count = 3, color = null) {
   // если недостаточно свободного места - игра закончена
   if (freeCells.length <= count) {
     gameOver = true;
+    showGameOver();
+    startGame();
     return false;
   }
   // распределяем шарики по свободным координатам из freeCells
@@ -89,7 +106,6 @@ function placeRandomBalls(count = 3, color = null) {
     let i = Math.floor(Math.random() * freeCells.length);
     let { y, x } = freeCells.splice(i, 1)[0]; // удаляем выбранную ячейку
     placeBall(y, x, color);
-    game[y][x] = -1;
   }
   // проверить - появились ли 5 шариков в ряд
   findAndRemove5balls(5);
@@ -247,6 +263,17 @@ function handleClick(e) {
   }
 }
 
+function showGameOver() {
+  isMoving = true; // prevent click
+  elGameOver.style.display = 'block';
+  setTimeout(() => {
+    elGameOver.style.display = 'none';
+    isMoving = false;
+    startGame();
+  }, 2000);
+
+}
+
 // начало игры: обнулить игоровое поле и таймер
 function startGame() {
   clearBoard();
@@ -267,11 +294,14 @@ document.addEventListener('DOMContentLoaded', () => {
   elStatus = document.getElementById('status');
   elScore = document.getElementById('score');
   elButton = document.getElementById('restart');
+  elGameOver = document.getElementById('gameover');
 
   elBoard.addEventListener('click', handleClick);
   elButton.addEventListener('click', startGame);
 
   startGame();
+  // for test
+  placeRandomBalls(70);
 
   /*   // размещаем сначала 5 случайных шариков
     // тест: щарики всех цветов
