@@ -12,7 +12,14 @@
   align-items: center;
 }
 
-#time_container, #score {
+.top_panel {
+  display: flex;
+  flex-direction: row;
+}
+
+.score_timer {
+  display: flex;
+  flex-direction: column;
   width: 150px;
   margin: 20px;
   font-size: 20pt;
@@ -23,6 +30,16 @@
   border-radius: 16px;
   background-color: black;
   color: white;
+}
+
+.score_timer__header {
+  font-size: 10pt;
+  text-align: center;
+  padding-bottom: 10px;
+}
+
+#score {
+  text-align: center;
 }
 
 #board, table {
@@ -40,8 +57,3 @@
   height: 50px;
 }
 
-.score_timer {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
