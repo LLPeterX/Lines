@@ -208,6 +208,7 @@ function findAndRemove5balls() {
   let ballsToRemove = find5(grid);
   // удаляем шарики по координатам из ballsToRemove {y,x}
   if (ballsToRemove) {
+    // тут бы с анимацией удаления...
     ballsToRemove.forEach(({ y, x }) => removeBall(y, x));
     updateScore(ballsToRemove.length); // плюсуем к счету кол-во удаленных
     return true;
@@ -290,8 +291,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   startGame();
 });
-
+/*
 function showGrid2(grid) {
   let out = grid.map(col => col.map(cell => cell ? String(cell).slice(0, 4).padEnd(4) : '____'));
   console.log(out);
-}
+} */
