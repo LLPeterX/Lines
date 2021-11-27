@@ -82,7 +82,7 @@ function find5(grid, maxCount = 5) {
 
 }
 
-
+/*
 // debug
 
 const grid = [
@@ -93,3 +93,5 @@ const grid = [
 ];
 
 console.log(find5(grid, 3));
+
+ */
